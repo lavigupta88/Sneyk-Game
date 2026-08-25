@@ -5,15 +5,11 @@ const blockWidth = 50;
 const cols = Math.floor(board.clientWidth / blockWidth);
 const rows = Math.floor(board.clientHeight / blockHeight);
 let intervalId = null;
+let food = {x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)};
 
 const blocks = []
 const snake = [ {
-    x: 1, y: 3
-// }, {
-//     x: 1, y: 4
-// }, {
-//     x: 1, y: 5
-// }]
+    x: 2, y: 4
 }]
 
 let direction = `down`
@@ -33,14 +29,10 @@ for(let row = 0; row < rows; row++){
     }
 }
 
-function render(){
-    snake.forEach(segment => {
-        blocks[`${segment.x},${segment.y}`].classList.add("fill")
-    });
-}
-
-intervalId = setInterval(() => {
+    function render(){
     let head = null;
+
+    blocks[`${food.x},${food.y}`].classList.add("food")
 
     if(direction === "left"){
         head = {x:snake[0].x, y:snake[0].y-1}
@@ -53,17 +45,44 @@ intervalId = setInterval(() => {
     }
 
     if(head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols){ 
-        alert("Game Over")
-        clearInterval(intervalId)
+        alert("Game Over It's Done Bro!!");
+        clearInterval(intervalId);
+        return;
+    }
+
+    // gpt changes
+    let ateFood = false;
+
+    if(head.x === food.x && head.y === food.y){
+        blocks[`${food.x},${food.y}`].classList.remove("food")
+        // gpt changes
+        ateFood = true;
+        food = {
+            x: Math.floor(Math.random() * rows), 
+            y: Math.floor(Math.random() * cols)
+        };
+        blocks[`${food.x},${food.y}`].classList.add("food");
+        // snake.unshift(head)
     }
 
     snake.forEach(segment=> {
         blocks[`${segment.x},${segment.y}`].classList.remove("fill")
     }) 
 
+    // changes gpt
     snake.unshift(head);
-    snake.pop()
+    if(!ateFood){
+        snake.pop();
+    }
 
+    // snake.unshift(head);
+    // snake.pop()
+    snake.forEach(segment => {
+        blocks[`${segment.x},${segment.y}`].classList.add("fill")
+    });
+}
+
+intervalId = setInterval(() => {
     render()
 },400);
 

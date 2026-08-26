@@ -1,4 +1,10 @@
 const board = document.querySelector('.board');
+const startButton = document.querySelector('.btn-start');
+const modal = document.querySelector('.modal');
+const startGameModal = document.querySelector(".start-game");
+const gameOverModal = document.querySelector(".game-over");
+const restartButton = document.querySelector(".btn-restart");
+
 const blockHeight = 50;
 const blockWidth = 50;
 
@@ -8,7 +14,7 @@ let intervalId = null;
 let food = {x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)};
 
 const blocks = []
-const snake = [ {
+let snake = [{
     x: 2, y: 4
 }]
 
@@ -45,8 +51,12 @@ for(let row = 0; row < rows; row++){
     }
 
     if(head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols){ 
-        alert("Game Over It's Done Bro!!");
+        // alert("Game Over It's Done Bro!!");
         clearInterval(intervalId);
+
+        modal.style.display = "flex"
+        startGameModal.style.display = "none"
+        gameOverModal.style.display = "flex"
         return;
     }
 
@@ -82,9 +92,30 @@ for(let row = 0; row < rows; row++){
     });
 }
 
-intervalId = setInterval(() => {
-    render()
-},400);
+// intervalId = setInterval(() => {
+//     render()
+// },300);
+
+startButton.addEventListener("click", () => {
+    modal.style.display = "none";
+    intervalId = setInterval(() =>{ render() }, 300);
+});
+
+restartButton.addEventListener("click",restartGame);
+
+function restartGame() {
+
+    blocks[`${food.x},${food.y}`].classList.remove("food");
+    snake.forEach(segment => {
+        blocks[`${segment.x},${segment.y}`].classList.remove("fill");
+    });
+
+    modal.style.display = "none";
+    direction = "down";
+    snake = [{ x: 2, y: 4 }];
+    food = {x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)};
+    intervalId = setInterval(() =>{ render() }, 300);
+}
 
 addEventListener("keydown", (event) => {
     if(event.key == "ArrowUp"){
@@ -96,4 +127,8 @@ addEventListener("keydown", (event) => {
     } else if(event.key == "ArrowDown"){
         direction = "down"
     }
+});
+
+window.addEventListener("resize", () => {
+    location.reload();
 });

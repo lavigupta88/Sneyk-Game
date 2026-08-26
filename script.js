@@ -64,7 +64,7 @@ for(let row = 0; row < rows; row++){
     }
 }
 
-    function render(){
+function render(){
     let head = null;
 
     blocks[`${food.x},${food.y}`].classList.add("food")
@@ -81,7 +81,6 @@ for(let row = 0; row < rows; row++){
 
     // wall collision logic
     if(head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols){ 
-        // alert("Game Over It's Done Bro!!");
         clearInterval(intervalId);
 
         modal.style.display = "flex"
@@ -91,16 +90,28 @@ for(let row = 0; row < rows; row++){
     }
 
     // gpt changes
-    let ateFood = false;
+    let ateFood = (head.x === food.x && head.y === food.y);
+
+    // self-collision logic (new)
+    // If not eating food this frame, the tail segment is about to move away,
+    // so it shouldn't count as a collision.
+    const bodyToCheck = ateFood ? snake : snake.slice(0, -1);
+    const hitSelf = bodyToCheck.some(segment => segment.x === head.x && segment.y === head.y);
+
+    if(hitSelf){
+        clearInterval(intervalId);
+
+        modal.style.display = "flex"
+        startGameModal.style.display = "none"
+        gameOverModal.style.display = "flex"
+        return;
+    }
 
     //food conume logic
-    if(head.x === food.x && head.y === food.y){
+    if(ateFood){
         blocks[`${food.x},${food.y}`].classList.remove("food")
-        // gpt changes
-        ateFood = true;
         food = generateFood();
         blocks[`${food.x},${food.y}`].classList.add("food");
-        // snake.unshift(head)
         score+=10
         scoreElement.innerText = score;
 
@@ -120,8 +131,6 @@ for(let row = 0; row < rows; row++){
         snake.pop();
     }
 
-    // snake.unshift(head);
-    // snake.pop()
     snake.forEach(segment => {
         blocks[`${segment.x},${segment.y}`].classList.add("fill")
     });

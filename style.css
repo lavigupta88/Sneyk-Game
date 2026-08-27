@@ -102,6 +102,7 @@ section .infos{
 
 .food{
     background-color: var(--bg-food-color);
+    border-radius: 50%;
 }
 
 .modal{
